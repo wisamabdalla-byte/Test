@@ -41,16 +41,31 @@ Requires Node.js 18 or later. There's nothing to install.
 In the first, book a ride as a rider. In the second, switch to **Drive (سوق)**, register, tap the map near the pickup point,
 and go online. The request appears, and both screens update live.
 
+## Try it on a phone (no server)
+
+`scripts/build-demo.js` bundles the whole app, including the ride logic, into one HTML page that runs
+entirely in the phone's browser. Demo drivers accept your ride and drive it on the map. The demo
+can't load OpenStreetMap tiles, so it draws a simple coastline map from Natural Earth data
+(`demo/libya-basemap.json`) instead. Each page load starts fresh.
+
+```bash
+npm pack leaflet@1.9.4 && tar xzf leaflet-1.9.4.tgz
+node scripts/build-demo.js package/dist/leaflet.css   # writes demo/mishwar-demo.html
+```
+
 ## How it's built
 
 ```
-server.js          HTTP server: JSON API, live updates via Server-Sent Events, static files
+server.js          HTTP server: live updates via Server-Sent Events, static files
+src/routes.js      JSON API routes (shared by the server and the phone demo)
 src/store.js       Riders, drivers, rides, ride status rules, matching, surge, ratings
 src/pricing.js     LYD fare model per ride type
 src/cities.js      Libyan service areas + distance math
 src/phone.js       Libyan mobile number validation
 public/            Web app (vanilla JS + Leaflet/OpenStreetMap), Arabic/English
 test/              node:test suites
+demo/              Standalone phone demo: in-browser runtime + basemap data
+scripts/           Demo build script
 ```
 
 A ride moves through these statuses: `requested → accepted → arrived → in_progress → completed`.

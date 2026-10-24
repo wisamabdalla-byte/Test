@@ -40,10 +40,14 @@
   // ---------- Map ----------
   const map = L.map('map', { zoomControl: false }).setView([32.8872, 13.1913], 13);
   L.control.zoom({ position: 'bottomleft' }).addTo(map);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map);
+  // The standalone demo can't load map tiles, so it draws its own basemap instead.
+  if (window.MishwarDemo) window.MishwarDemo.basemap(map);
+  else {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+  }
   const pin = (cls, text) => L.divIcon({ className: `mk ${cls}`, html: text || '', iconSize: [28, 28], iconAnchor: [14, 14] });
   const markers = {};
   function setMarker(name, point, cls, text) {

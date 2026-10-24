@@ -1,9 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { Store, HttpError, PAYMENT_METHODS } = require('./src/store');
-const { CITIES } = require('./src/cities');
-const { RIDE_TYPES } = require('./src/pricing');
+const { Store, HttpError } = require('./src/store');
+const { buildRoutes } = require('./src/routes');
 
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml' };
@@ -50,33 +49,7 @@ function createApp(store = new Store()) {
     for (const res of sseClients) res.write(line);
   });
 
-  // [method, pattern, handler(params, body, query)]
-  const routes = [
-    ['GET', /^\/api\/config$/, () => ({ cities: CITIES, rideTypes: RIDE_TYPES, payments: PAYMENT_METHODS })],
-    ['POST', /^\/api\/riders$/, (p, body) => store.registerRider(body)],
-    ['POST', /^\/api\/drivers$/, (p, body) => store.registerDriver(body)],
-    ['GET', /^\/api\/drivers\/([\w]+)$/, ([id]) => ({ ...store.getDriver(id), activeRide: store.activeRideForDriver(id) })],
-    ['POST', /^\/api\/drivers\/([\w]+)\/status$/, ([id], body) => store.setDriverStatus(id, body)],
-    ['GET', /^\/api\/drivers\/([\w]+)\/requests$/, ([id]) => store.openRidesFor(id)],
-    ['POST', /^\/api\/quote$/, (p, body) => store.quote(body.pickup, body.dropoff)],
-    ['POST', /^\/api\/rides$/, (p, body) => store.publicRide(store.requestRide(body), { includePin: true })],
-    [
-      'GET',
-      /^\/api\/rides\/([\w]+)$/,
-      ([id], body, query) => {
-        const ride = store.getRide(id);
-        return store.publicRide(ride, { includePin: query.get('riderId') === ride.riderId });
-      },
-    ],
-    ['POST', /^\/api\/rides\/([\w]+)\/accept$/, ([id], body) => store.publicRide(store.acceptRide(id, body.driverId))],
-    [
-      'POST',
-      /^\/api\/rides\/([\w]+)\/(arrived|start|complete)$/,
-      ([id, action], body) => store.publicRide(store.driverAction(id, body.driverId, action, body)),
-    ],
-    ['POST', /^\/api\/rides\/([\w]+)\/cancel$/, ([id], body) => store.publicRide(store.cancelRide(id, body))],
-    ['POST', /^\/api\/rides\/([\w]+)\/rate$/, ([id], body) => store.publicRide(store.rateDriver(id, body.riderId, body.stars))],
-  ];
+  const routes = buildRoutes(store);
 
   return http.createServer(async (req, res) => {
     const { pathname, searchParams } = new URL(req.url, 'http://x');
