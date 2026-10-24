@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mishwar · مشوار</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="logo">م</span> <span data-i18n="appName"></span></div>
+    <nav class="roles">
+      <button class="role active" data-role="rider" data-i18n="rider"></button>
+      <button class="role" data-role="driver" data-i18n="driver"></button>
+    </nav>
+    <button id="lang" class="ghost"></button>
+  </header>
+
+  <main>
+    <div id="map"></div>
+
+    <section id="panel" class="panel">
+      <!-- Registration (shared by rider/driver) -->
+      <form id="register" class="card hidden">
+        <h2 data-i18n="signUp"></h2>
+        <label><span data-i18n="name"></span><input name="name" required autocomplete="name" /></label>
+        <label><span data-i18n="phone"></span><input name="phone" required inputmode="tel" placeholder="091 234 5678" /></label>
+        <div class="driver-only">
+          <label><span data-i18n="gender"></span>
+            <select name="gender"><option value="male" data-i18n="male"></option><option value="female" data-i18n="female"></option></select>
+          </label>
+          <label><span data-i18n="car"></span><input name="car" placeholder="Hyundai Elantra 2018" /></label>
+          <label><span data-i18n="plate"></span><input name="plate" placeholder="5-123456" /></label>
+          <fieldset><legend data-i18n="rideTypesOffered"></legend><div id="driverTypes" class="chips"></div></fieldset>
+        </div>
+        <p class="error" id="registerError"></p>
+        <button class="primary" type="submit" data-i18n="continue"></button>
+      </form>
+
+      <!-- Rider: book a ride -->
+      <div id="riderBook" class="card hidden">
+        <div class="row">
+          <select id="city"></select>
+          <button id="locateRider" class="ghost" type="button" data-i18n="myLocation"></button>
+        </div>
+        <p class="hint" id="pickHint"></p>
+        <div class="stops">
+          <div><span class="dot green"></span><input id="pickupLabel" data-i18n-ph="pickup" /></div>
+          <div><span class="dot red"></span><input id="dropoffLabel" data-i18n-ph="dropoff" /></div>
+        </div>
+        <div id="quote" class="hidden">
+          <p class="meta" id="tripMeta"></p>
+          <div id="rideTypes" class="options"></div>
+          <div class="row">
+            <span data-i18n="payment"></span>
+            <div id="payments" class="chips"></div>
+          </div>
+          <p class="error" id="bookError"></p>
+          <button id="requestRide" class="primary" type="button" data-i18n="requestRide"></button>
+        </div>
+        <button id="resetStops" class="link" type="button" data-i18n="reset"></button>
+      </div>
+
+      <!-- Rider: active ride -->
+      <div id="riderRide" class="card hidden">
+        <h2 id="rideStatus"></h2>
+        <div id="driverInfo" class="hidden">
+          <div class="driver-card">
+            <div class="avatar" id="driverAvatar"></div>
+            <div>
+              <strong id="driverName"></strong> · ★ <span id="driverRating"></span>
+              <div class="meta" id="driverCar"></div>
+            </div>
+            <a id="callDriver" class="ghost" data-i18n="call"></a>
+          </div>
+        </div>
+        <p class="pin"><span data-i18n="yourPin"></span> <strong id="ridePin"></strong></p>
+        <p class="meta" id="rideFare"></p>
+        <div id="rateBox" class="hidden">
+          <p data-i18n="rateDriver"></p>
+          <div class="stars" id="stars"></div>
+        </div>
+        <button id="cancelRide" class="danger" type="button" data-i18n="cancel"></button>
+        <button id="newRide" class="primary hidden" type="button" data-i18n="done"></button>
+      </div>
+
+      <!-- Driver dashboard -->
+      <div id="driverDash" class="card hidden">
+        <div class="row">
+          <div><strong id="driverSelfName"></strong><div class="meta" id="driverEarnings"></div></div>
+          <label class="switch"><input type="checkbox" id="onlineToggle" /><span data-i18n="online"></span></label>
+        </div>
+        <p class="hint" data-i18n="driverHint"></p>
+        <button id="locateDriver" class="ghost" type="button" data-i18n="myLocation"></button>
+        <p class="error" id="driverError"></p>
+        <div id="requests"></div>
+        <div id="driverRide" class="hidden">
+          <h3 id="driverRideStatus"></h3>
+          <p class="meta" id="driverRideInfo"></p>
+          <a id="callRider" class="ghost" data-i18n="call"></a>
+          <label class="sim"><input type="checkbox" id="simulate" checked /> <span data-i18n="simulate"></span></label>
+          <div id="pinBox" class="row hidden">
+            <input id="pinInput" inputmode="numeric" maxlength="4" data-i18n-ph="enterPin" />
+          </div>
+          <button id="driverNext" class="primary" type="button"></button>
+          <button id="driverRelease" class="link" type="button" data-i18n="release"></button>
+        </div>
+      </div>
+
+      <button id="logout" class="link hidden" type="button" data-i18n="logout"></button>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/i18n.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
